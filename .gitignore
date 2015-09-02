@@ -10,6 +10,10 @@ cabal-dev
 cabal.sandbox.config
 cabal.config
 
+# editor stuff
+*~
+*.swp
+
 # =========================
 # Operating System Files
 # =========================
