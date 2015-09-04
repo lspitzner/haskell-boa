@@ -1,5 +1,7 @@
 module Main where
 
+import Arguments (parseArguments)
+
 main :: IO ()
 main =
  do (constraintLocs, moduleLocs) <- parseArguments
@@ -24,16 +26,13 @@ data Module =
 
 data ModuleImport = ModuleImport Module Module
 
-parseArguments :: IO ([ConstraintLocation], [ModuleLocation])
-parseArguments = undefined
-
 getImports :: [ModuleLocation] -> IO [ModuleImport]
 getImports locs = undefined
 
 getConstraints :: [ConstraintLocation] -> IO [Constraint]
 getConstraints locs = undefined
 
-checkConstraints :: [Constraint] -> ImportGraph -> [Violation]
+checkConstraints :: [Constraint] -> [ModuleImport] -> [Violation]
 checkConstraints constraints graph = undefined
 
 outputViolations :: [Violation] -> IO ()
