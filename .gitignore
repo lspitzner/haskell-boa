@@ -10,6 +10,9 @@ cabal-dev
 cabal.sandbox.config
 cabal.config
 
+# executables
+*.exe
+
 # editor stuff
 *~
 *.swp
