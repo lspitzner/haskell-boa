@@ -1,6 +1,7 @@
 module Main where
 
 import Arguments (parseArguments)
+import HaskellImports (Module, ModuleImport, getImports)
 
 main :: IO ()
 main =
@@ -11,7 +12,6 @@ main =
     outputViolations violations
 
 type ConstraintLocation = FilePath
-type ModuleLocation = FilePath
 
 data Constraint =
       Permitted [Module] [Module]
@@ -19,15 +19,6 @@ data Constraint =
 
 data Violation =
     Violation Constraint ModuleImport
-
-data Module =
-      Name String
-    | Namespace String Module
-
-data ModuleImport = ModuleImport Module Module
-
-getImports :: [ModuleLocation] -> IO [ModuleImport]
-getImports locs = undefined
 
 getConstraints :: [ConstraintLocation] -> IO [Constraint]
 getConstraints locs = undefined
