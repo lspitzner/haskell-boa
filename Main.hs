@@ -2,6 +2,7 @@ module Main where
 
 import Arguments (parseArguments)
 import HaskellImports (Module, ModuleImport, getImports)
+import Types
 
 main :: IO ()
 main =
@@ -10,15 +11,6 @@ main =
     constraints <- getConstraints constraintLocs
     let violations = checkConstraints constraints imports
     outputViolations violations
-
-type ConstraintLocation = FilePath
-
-data Constraint =
-      Permitted [Module] [Module]
-    | Forbidden [Module] [Module]
-
-data Violation =
-    Violation Constraint ModuleImport
 
 getConstraints :: [ConstraintLocation] -> IO [Constraint]
 getConstraints locs = undefined

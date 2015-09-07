@@ -1,16 +1,12 @@
 module HaskellImports (Module, ModuleImport, getImports) where
 
+import Types
 import Language.Haskell.Exts (parseFile, fromParseResult)
 import qualified Language.Haskell.Exts as L
 
 
 import System.Exit (exitFailure)
 
-type ModuleLocation = FilePath
-
-data ModuleImport = ModuleImport Module Module
-
-newtype Module = Name String
 
 getImports :: [ModuleLocation] -> IO [ModuleImport]
 getImports locs =
