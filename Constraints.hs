@@ -2,6 +2,7 @@ module Constraints (getConstraints, checkConstraints) where
 
 import System.Exit (exitFailure)
 import Control.Monad (void)
+import Data.Maybe (catMaybes)
 
 import Text.Parsec
 import Text.Parsec.String
@@ -22,7 +23,7 @@ parseConstraints loc =
         return constraints
 
 constraintExpParser :: Parser [Constraint]
-constraintExpParser = undefined
+constraintExpParser = many constraintParser
 
 constraintParser :: Parser Constraint
 constraintParser =
@@ -53,5 +54,19 @@ moduleNames =
 moduleNameParser :: Parser Module
 moduleNameParser = fmap Name $ many1 anyChar 
 
+-- Note: Currently really inefficient. At least quadratic. There should be datastructures which are infinitely better than lists.
 checkConstraints :: [Constraint] -> [ModuleImport] -> [Violation]
-checkConstraints constraints imports = undefined
+checkConstraints constraints imports = concatMap (flip helper imports) constraints
+ let
+    helper :: Constraint -> [ModuleImport] -> [Violation]
+    helper c ms = catMaybes $ map (isViolatedBy c) ms
+
+isViolatedBy :: Constraint -> ModuleImport -> Maybe Violation
+isViolatedBy c@(Permitted importingModules modules) i@(ModuleImport importer importedModule) =
+    if importer `elem` importingModules && importedModule `elem` modules
+      then Nothing
+      else Violation c i
+isViolatedBy (Forbidden importingModules modules) (ModuleImport importer importedModule) =
+    if importer `elem` importingModules && importedModule `elem` modules
+      then Violation c i
+      else Nothing
