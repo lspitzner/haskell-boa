@@ -8,6 +8,7 @@ data Constraint =
 
 data Violation =
     Violation Constraint ModuleImport
+
 type ModuleLocation = FilePath
 
 data ModuleImport = ModuleImport Module Module

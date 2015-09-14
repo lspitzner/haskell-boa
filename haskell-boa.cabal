@@ -19,6 +19,11 @@ executable haskell-boa
   main-is:             Main.hs
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       base >=4.8 && <4.9, haskell-src-exts >=1.16 && <1.17, directory >=1.2 && <1.3, filepath >=1.4 && <1.5
+  build-depends:
+    base >=4.8 && <4.9,
+    haskell-src-exts >=1.16 && <1.17,
+    directory >=1.2 && <1.3,
+    filepath >=1.4 && <1.5,
+    parsec >=3.1.9 && <3.2
   -- hs-source-dirs:      
   default-language:    Haskell2010
