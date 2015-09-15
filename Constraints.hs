@@ -57,7 +57,7 @@ moduleNameParser = fmap Name $ many1 anyChar
 -- Note: Currently really inefficient. At least quadratic. There should be datastructures which are infinitely better than lists.
 checkConstraints :: [Constraint] -> [ModuleImport] -> [Violation]
 checkConstraints constraints imports = concatMap (flip helper imports) constraints
- let
+  where
     helper :: Constraint -> [ModuleImport] -> [Violation]
     helper c ms = catMaybes $ map (isViolatedBy c) ms
 
@@ -65,8 +65,8 @@ isViolatedBy :: Constraint -> ModuleImport -> Maybe Violation
 isViolatedBy c@(Permitted importingModules modules) i@(ModuleImport importer importedModule) =
     if importer `elem` importingModules && importedModule `elem` modules
       then Nothing
-      else Violation c i
-isViolatedBy (Forbidden importingModules modules) (ModuleImport importer importedModule) =
+      else Just $ Violation c i
+isViolatedBy c@(Forbidden importingModules modules) i@(ModuleImport importer importedModule) =
     if importer `elem` importingModules && importedModule `elem` modules
-      then Violation c i
+      then Just $ Violation c i
       else Nothing

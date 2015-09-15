@@ -14,3 +14,4 @@ type ModuleLocation = FilePath
 data ModuleImport = ModuleImport Module Module
 
 newtype Module = Name String
+    deriving (Eq)
