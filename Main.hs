@@ -14,4 +14,10 @@ main =
     outputViolations violations
 
 outputViolations :: [Violation] -> IO ()
-outputViolations violations = undefined
+outputViolations vs = putStrLn $ unlines $ map showViolation vs
+
+showViolation :: Violation -> String
+showViolation (Violation constr (ModuleImport (Name importer) (Name imported))) =
+    case constr of
+      Permitted _ _ -> "Non-permitted import of " ++ imported ++ " in " ++ importer
+      Forbidden _ _ -> "Forbidden import of" ++ imported ++ " in " ++ importer
