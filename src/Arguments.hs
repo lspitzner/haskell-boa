@@ -3,10 +3,10 @@ module Arguments (parseArguments) where
 import System.Directory (doesDirectoryExist, doesFileExist, getDirectoryContents)
 import System.Environment (getArgs)
 import System.Exit (exitFailure)
-import System.FilePath (takeExtension, isValid)
+import System.FilePath (takeExtension, isValid, (</>))
 
 import Control.Applicative (liftA2)
-import Data.List (partition)
+import Data.List (partition, isSuffixOf)
 
 parseArguments :: IO ([FilePath], [FilePath])
 parseArguments =
@@ -47,13 +47,11 @@ doesDirectoryOrFileExist = liftA2 (liftA2 (||)) doesDirectoryExist doesFileExist
 expandDirectories :: [FilePath] -> IO [FilePath]
 expandDirectories [] = return []
 expandDirectories paths =
- do let nontrivialPaths = filter (liftA2 (||) (/= ".") (/= "..")) paths
+ do let nontrivialPaths = filter (liftA2 (&&) (not . isSuffixOf ".") (not . isSuffixOf "..")) paths
     (dirs, files) <- partitionM doesDirectoryExist nontrivialPaths
-    putStrLn $ concat files
-    putStrLn $ concat dirs
-    deeperPaths <- fmap concat $ mapM getDirectoryContents dirs
+    deeperPaths <- fmap concat $ mapM (\dir -> fmap (map (dir </>)) $ getDirectoryContents dir) dirs
     deeperFiles <- expandDirectories deeperPaths
-    return $ files ++ deeperFiles 
+    return $ files ++ deeperFiles
 
 partitionM :: (Monad m) => (a -> m Bool) -> [a] -> m ([a],[a]) 
 partitionM pred list =

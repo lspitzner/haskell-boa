@@ -34,7 +34,8 @@ constraintParser =
     constraintSpecifier <- string "permit" <|> string "forbid"
     spaces
     constrainingModules <- moduleNames
-    (void endOfLine) <|> eof
+    spaces
+    eof <|> (void endOfLine)
     if constraintSpecifier == "permit"
       then
         return $ Permitted constrainedModules constrainingModules

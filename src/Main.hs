@@ -8,6 +8,8 @@ import Types
 main :: IO ()
 main =
  do (constraintLocs, moduleLocs) <- parseArguments
+    putStrLn (show constraintLocs)
+    putStrLn (show moduleLocs)
     imports <- getImports moduleLocs
     constraints <- getConstraints constraintLocs
     let violations = checkConstraints constraints imports

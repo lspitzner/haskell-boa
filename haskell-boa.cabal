@@ -3,7 +3,7 @@
 
 name:                haskell-boa
 version:             0.0.0.1
-synopsis:            A program for controlling which modules can be used.
+synopsis:            A program to check and impose constraints on imports in Haskell modules.
 -- description:         
 license:             BSD3
 license-file:        LICENSE
@@ -25,5 +25,5 @@ executable boa
     directory >=1.2 && <1.3,
     filepath >=1.4 && <1.5,
     parsec >=3.1.9 && <3.2
-  -- hs-source-dirs:      
+  hs-source-dirs:      src
   default-language:    Haskell2010

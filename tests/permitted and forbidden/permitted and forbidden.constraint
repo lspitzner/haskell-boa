@@ -1,0 +1,2 @@
+for [B] permit [A]
+for [B] forbid [A]
