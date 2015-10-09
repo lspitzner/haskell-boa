@@ -1,5 +1,7 @@
 module Types where
 
+data Command = Check
+
 type ConstraintLocation = FilePath
 
 data Constraint =

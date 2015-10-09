@@ -7,7 +7,9 @@ import Types
 
 main :: IO ()
 main =
- do (constraintLocs, moduleLocs) <- parseArguments
+ do (_, constraintLocs, moduleLocs) <- parseArguments
+    -- the command is discarded because currently there is only one of them
+    -- more will (hopefully) come in the future
     putStrLn (show constraintLocs)
     putStrLn (show moduleLocs)
     imports <- getImports moduleLocs
@@ -22,4 +24,4 @@ showViolation :: Violation -> String
 showViolation (Violation constr (ModuleImport (Name importer) (Name imported))) =
     case constr of
       Permitted _ _ -> "Non-permitted import of " ++ imported ++ " in " ++ importer
-      Forbidden _ _ -> "Forbidden import of" ++ imported ++ " in " ++ importer
+      Forbidden _ _ -> "Forbidden import of " ++ imported ++ " in " ++ importer

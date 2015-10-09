@@ -1,5 +1,7 @@
 module Arguments (parseArguments) where
 
+import Types (Command(Check))
+
 import System.Directory (doesDirectoryExist, doesFileExist, getDirectoryContents)
 import System.Environment (getArgs)
 import System.Exit (exitFailure)
@@ -8,10 +10,27 @@ import System.FilePath (takeExtension, isValid, (</>))
 import Control.Applicative (liftA2)
 import Data.List (partition, isSuffixOf)
 
-parseArguments :: IO ([FilePath], [FilePath])
+parseArguments :: IO (Command, [FilePath], [FilePath])
 parseArguments =
  do args <- getArgs
-    validatedArgs <- validateArgs args
+    if null args
+      then
+         do putStrLn "Missing Arguments."
+            exitFailure
+      else
+         do c <- fmap head getArgs
+            command <- checkCommand c
+            (p1, p2) <- parsePathArguments
+            return (command, p1, p2)
+
+checkCommand :: String -> IO Command
+checkCommand "check" = return Check
+checkCommand c = putStrLn ("Invalid Command: " ++ c) >> exitFailure
+
+parsePathArguments :: IO ([FilePath], [FilePath])
+parsePathArguments =
+ do pathargs <- fmap (drop 1) getArgs
+    validatedArgs <- validateArgs pathargs
     files <- expandDirectories validatedArgs
     return $ partition isConstraint (filter (liftA2 (||) isHaskell isConstraint) files)
 
