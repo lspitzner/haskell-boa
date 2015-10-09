@@ -1,13 +1,52 @@
 module Constraints (getConstraints, checkConstraints) where
 
 import System.Exit (exitFailure)
+import Control.Applicative (liftA2)
 import Control.Monad (void)
 import Data.Maybe (catMaybes)
+import Data.Char (isAlphaNum)
 
 import Text.Parsec
 import Text.Parsec.String
 
 import Types
+
+data Token =
+      TName String
+    | TOpenBracket
+    | TCloseBracket
+    | TComma
+    | TForbid
+    | TPermit
+    | TFor
+  deriving (Show, Eq)
+
+lexer :: Parser a -> Parser a
+lexer p =
+ do r <- p
+    spaces
+    return r
+
+tName :: Parser Token
+tName = lexer $ fmap TName $ many1 $ satisfy (liftA2 (||) isAlphaNum (== '.'))
+
+tOpenBracket :: Parser Token
+tOpenBracket = lexer $ fmap (const TOpenBracket) $ char '['
+
+tCloseBracket :: Parser Token
+tCloseBracket = lexer $ fmap (const TCloseBracket) $ char ']'
+
+tComma :: Parser Token
+tComma = lexer $ fmap (const TComma) $ char ','
+
+tForbid :: Parser Token
+tForbid = lexer $ fmap (const TForbid) $ string "forbid"
+
+tPermit :: Parser Token
+tPermit = lexer $ fmap (const TPermit) $ string "permit"
+
+tFor :: Parser Token
+tFor = lexer $ fmap (const TFor) $ string "for"
 
 getConstraints :: [ConstraintLocation] -> IO [Constraint]
 getConstraints locs = fmap concat $ mapM parseConstraints locs
@@ -27,33 +66,29 @@ constraintExpParser = many constraintParser
 
 constraintParser :: Parser Constraint
 constraintParser =
- do string "for"
+ do tFor
     spaces
-    constrainedModules <- moduleNames
-    spaces
-    constraintSpecifier <- string "permit" <|> string "forbid"
-    spaces
-    constrainingModules <- moduleNames
-    spaces
-    eof <|> (void endOfLine)
-    if constraintSpecifier == "permit"
+    constrainedModules <- moduleList
+    constraintSpecifier <- tPermit <|> tForbid
+    constrainingModules <- moduleList
+    if constraintSpecifier == TPermit
       then
         return $ Permitted constrainedModules constrainingModules
       else
         return $ Forbidden constrainedModules constrainingModules
 
-moduleNames :: Parser [Module]
-moduleNames =
- do spaces
-    char '['
-    spaces
-    result <- sepBy1 moduleNameParser (spaces >> char ',' >> spaces)
-    spaces
-    char ']'
+moduleList :: Parser [Module]
+moduleList =
+ do tOpenBracket
+    result <- sepBy1 moduleNameParser tComma
+    tCloseBracket
     return result
 
 moduleNameParser :: Parser Module
-moduleNameParser = fmap Name $ many1 anyChar 
+moduleNameParser = fmap getName $ tName
+  where
+    getName (TName name) = Name name
+    getName _ = error "moduleNameParser: This should not happen."
 
 -- Note: Currently really inefficient. At least quadratic. There should be datastructures which are infinitely better than lists.
 checkConstraints :: [Constraint] -> [ModuleImport] -> [Violation]
